@@ -12,7 +12,7 @@
 
 #include <linux/stringify.h>
 
-#ifdef CONFIG_ARM64_LSE_ATOMICS
+#if IS_ENABLED(CONFIG_ARM64_LSE_ATOMICS) && IS_ENABLED(CONFIG_AS_LSE)
 #define __LL_SC_FALLBACK(asm_ops)					\
 "	b	3f\n"							\
 "	.subsection	1\n"						\

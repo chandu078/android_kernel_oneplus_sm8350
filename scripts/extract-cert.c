@@ -49,7 +49,6 @@ static void display_openssl_errors(int l)
 	}
 }
 
-#ifndef OPENSSL_IS_BORINGSSL
 static void drain_openssl_errors(void)
 {
 	const char *file;
@@ -59,7 +58,6 @@ static void drain_openssl_errors(void)
 		return;
 	while (ERR_get_error_line(&file, &line)) {}
 }
-#endif
 
 #define ERR(cond, fmt, ...)				\
 	do {						\
@@ -114,10 +112,6 @@ int main(int argc, char **argv)
 		fclose(f);
 		exit(0);
 	} else if (!strncmp(cert_src, "pkcs11:", 7)) {
-#ifdef OPENSSL_IS_BORINGSSL
-		ERR(1, "BoringSSL does not support extracting from PKCS#11");
-		exit(1);
-#else
 		ENGINE *e;
 		struct {
 			const char *cert_id;
@@ -140,7 +134,6 @@ int main(int argc, char **argv)
 		ENGINE_ctrl_cmd(e, "LOAD_CERT_CTRL", 0, &parms, NULL, 1);
 		ERR(!parms.cert, "Get X.509 from PKCS#11");
 		write_cert(parms.cert);
-#endif
 	} else {
 		BIO *b;
 		X509 *x509;
