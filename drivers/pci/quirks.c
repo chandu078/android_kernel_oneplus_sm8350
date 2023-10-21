@@ -2415,6 +2415,20 @@ DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_NVIDIA,  PCI_DEVICE_ID_NVIDIA_CK804_PCIE,
 DECLARE_PCI_FIXUP_RESUME_EARLY(PCI_VENDOR_ID_NVIDIA,  PCI_DEVICE_ID_NVIDIA_CK804_PCIE,
 			quirk_nvidia_ck804_pcie_aer_ext_cap);
 
+/*
+ * Quirk to limit QCOM RC MPS to 128 in case of Realtek 8168
+ * attaches.
+ */
+static void quirk_realtek_rc_mpss_limit(struct pci_dev *pdev)
+{
+	struct pci_dev *root_port = pcie_find_root_port(pdev);
+
+	if (root_port->vendor  == PCI_VENDOR_ID_QCOM)
+		pcie_set_mps(root_port, 128);
+}
+DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_REALTEK, 0x8168,
+			quirk_realtek_rc_mpss_limit);
+
 static void quirk_via_cx700_pci_parking_caching(struct pci_dev *dev)
 {
 	/*
@@ -4168,6 +4182,8 @@ DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_MARVELL_EXT, 0x9220,
 			 quirk_dma_func1_alias);
 /* https://bugzilla.kernel.org/show_bug.cgi?id=42679#c49 */
 DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_MARVELL_EXT, 0x9230,
+			 quirk_dma_func1_alias);
+DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_MARVELL_EXT, 0x9235,
 			 quirk_dma_func1_alias);
 DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_TTI, 0x0642,
 			 quirk_dma_func1_alias);
